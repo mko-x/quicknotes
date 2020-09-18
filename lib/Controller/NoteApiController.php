@@ -37,7 +37,7 @@ class NoteApiController extends ApiController {
 	private $userId;
 
 	public function __construct($AppName,
-	                            IRequest      $request,
+	                            IRequest    $request,
 	                            NoteService $noteService,
 	                            $userId)
 	{
@@ -61,6 +61,7 @@ class NoteApiController extends ApiController {
 		$lastModified->setTimestamp($timestamp);
 
 		$response = new JSONResponse($notes);
+
 		$response->setETag($etag);
 		$response->setLastModified($lastModified);
 
@@ -74,7 +75,7 @@ class NoteApiController extends ApiController {
 	 *
 	 * @param int $id
 	 */
-	public function show($id): JSONResponse {
+	public function show(int $id): JSONResponse {
 		$note = $this->noteService->get($this->userId, $id);
 		if (is_null($note)) {
 			return new JSONResponse([], Http::STATUS_NOT_FOUND);
@@ -97,7 +98,7 @@ class NoteApiController extends ApiController {
 	 * @param string $content
 	 * @param string $color
 	 */
-	public function create($title, $content, $color = "#F7EB96") {
+	public function create(string $title, string $content, string $color = "#F7EB96") {
 		$note = $this->noteService->create($this->userId, $title, $content, $color);
 
 		$etag = md5(json_encode($note));
@@ -116,14 +117,14 @@ class NoteApiController extends ApiController {
 	 * @param int $id
 	 * @param string $title
 	 * @param string $content
-	 * @param array $attachts
-	 * @param bool $pinned
+	 * @param array $attachments
+	 * @param bool $isPinned
 	 * @param array $tags
-	 * @param array $shared_with
+	 * @param array $sharedWith
 	 * @param string $color
 	 */
-	public function update(int $id, string $title, string $content, array $attachts, bool $pinned, array $tags, array $shared_with, string $color = "#F7EB96"): JSONResponse {
-		$note = $this->noteService->update($this->userId, $id, $title, $content, $attachts, $pinned, $tags, $shared_with, $color);
+	public function update(int $id, string $title, string $content, array $attachments, bool $isPinned, array $tags, array $sharedWith, string $color): JSONResponse {
+		$note = $this->noteService->update($this->userId, $id, $title, $content, $attachments, $isPinned, $tags, $sharedWith, $color);
 		if (is_null($note)) {
 			return new JSONResponse([], Http::STATUS_NOT_FOUND);
 		}

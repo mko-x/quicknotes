@@ -81,24 +81,21 @@ class NoteService {
 
 		// Set shares with others.
 		foreach($notes as $note) {
-			$note->setIsShared(false);
 			$note->setSharedWith($this->noteShareMapper->getSharesForNote($note->getId()));
 		}
 
 		// Get shares from others.
-		$shares = [];
+		$sharedNotes = [];
 		$sharedEntries = $this->noteShareMapper->findForUser($userId);
 		foreach($sharedEntries as $sharedEntry) {
 			$sharedNote = $this->notemapper->findShared($sharedEntry->getNoteId());
-			$sharedNote->setIsShared(true);
-
 			$sharedEntry->setUserId($sharedNote->getUserId());
-			$sharedNote->setSharedBy([$sharedEntry]);
-			$shares[] = $sharedNote;
+			$sharedNote->setSharedBy($sharedEntry);
+			$sharedNotes[] = $sharedNote;
 		}
 
 		// Attahch shared notes from others to same response
-		$notes = array_merge($notes, $shares);
+		$notes = array_merge($notes, $sharedNotes);
 
 		// Set tags to response.
 		foreach($notes as $note) {
@@ -157,7 +154,7 @@ class NoteService {
 	 * @param string $content
 	 * @param string $color
 	 */
-	public function create(string $userId, string $title, string $content, string $color = NULL): Note {
+	public function create(string $userId, string $title, string $content, string $color = null): Note {
 		if (is_null($color)) {
 			$color = $this->settingsService->getColorForNewNotes();
 		}
@@ -174,11 +171,11 @@ class NoteService {
 		// Create note and insert it
 		$note = new Note();
 
+		$note->setUserId($userId);
 		$note->setTitle($title);
 		$note->setContent($content);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
-		$note->setUserId($userId);
 
 		$newNote = $this->notemapper->insert($note);
 
@@ -343,7 +340,6 @@ class NoteService {
 		$newnote->setAttachts($attachts);
 
 		// Fill shared with with others
-		$newnote->setIsShared(false);
 		$newnote->setSharedWith($this->noteShareMapper->getSharesForNote($newnote->getId()));
 
 		//  Remove old color if necessary
@@ -383,10 +379,15 @@ class NoteService {
 			$this->colormapper->delete($oldcolor);
 		}
 
+		// Drop attach.
 		$attachts = $this->attachMapper->findFromNote($userId, $id);
 		foreach ($attachts as $attach) {
 			$this->attachMapper->delete($attach);
 		}
+
+		// Purge orphan tags.
+		$this->tagmapper->dropOld();
+
 	}
 
 }

@@ -13,9 +13,8 @@ class Note extends Entity implements JsonSerializable {
 	protected $timestamp;
 	protected $colorId;
 	protected $userId;
-	protected $sharedWith = [];
-	protected $sharedBy = [];
-	protected $isShared;
+	protected $sharedWith;
+	protected $sharedBy;
 	protected $tags;
 	protected $attachts;
 
@@ -32,20 +31,17 @@ class Note extends Entity implements JsonSerializable {
 
 	public function jsonSerialize() {
 		return [
-			'id' => $this->id,
-			'title' => $this->title,
-			'content' => $this->content,
-			'pinned' => $this->pinned,
-			'ispinned' => $this->isPinned,
-			'timestamp' => $this->timestamp,
-			'colorid' => $this->colorId,
-			'color' => $this->color,
-			'userid' => $this->userId,
-			'shared_with' => $this->sharedWith,
-			'shared_by' => $this->sharedBy,
-			'is_shared' => $this->isShared,
-			'tags' => $this->tags,
-			'attachts' => $this->attachts
+			'id'          => $this->id,
+			'title'       => $this->title,
+			'content'     => $this->content,
+			'isPinned'    => $this->isPinned,
+			'timestamp'   => $this->timestamp,
+			'colorId'     => $this->colorId,
+			'color'       => $this->color,
+			'sharedWith'  => $this->sharedWith,
+			'sharedBy'    => $this->sharedBy,
+			'tags'        => $this->tags,
+			'attachments' => $this->attachts
 		];
 	}
 }

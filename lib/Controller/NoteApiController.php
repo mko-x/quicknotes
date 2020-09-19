@@ -54,6 +54,7 @@ class NoteApiController extends ApiController {
 	 */
 	public function index(): JSONResponse {
 		$notes = $this->noteService->getAll($this->userId);
+
 		$etag = md5(json_encode($notes));
 
 		$lastModified = new \DateTime(null, new \DateTimeZone('GMT'));

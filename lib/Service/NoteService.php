@@ -82,6 +82,7 @@ class NoteService {
 		// Set shares with others.
 		foreach($notes as $note) {
 			$note->setSharedWith($this->noteShareMapper->getSharesForNote($note->getId()));
+			$note->setSharedBy([]);
 		}
 
 		// Get shares from others.
